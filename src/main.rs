@@ -1,12 +1,20 @@
-#![allow(unused)]
+use tokio::process::Command;
+use anyhow::Result;
 
-use std::{path::Path, process::{Command, Output}};
-use anyhow::{Result, Context};
+#[tokio::main]
+async fn main() -> Result<()> {
+    println!("Starting the orchestrator...");
 
-mod config;
-mod pipeline;
-mod runner;
+    let handle = tokio::spawn(async {
+        Command::new("sleep").arg("5").status().await
+    });
 
-fn main() -> Result<()> {
+    println!("I am not waiting for the sleep command!");
+    println!("I can do other things here, like monitor other jobs.");
+
+    let status = handle.await??;
+
+    println!("Done!");
+    println!("{:#?}", status);
     Ok(())
 }
